@@ -1,0 +1,12 @@
+{
+  "name": "prueba_talentum",
+  "version": "1.0.0",
+  "description": "",
+  "main": "desafio1.js",
+  "__type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
