@@ -15,4 +15,27 @@ Escribe consultas (en MySQL) para rescatar la siguiente información del modelo 
     Lista de titanes con incongruencias en torno a sus fechas de muerte y avistamientos.
 */
 -- Nombre y altura del titán más alto que haya matado el “Batallón 1”.
-SELECT titanes.nombre, titanes.altura FROM muertes JOIN titanes ON titanes.id=muertes.id_titan WHERE muertes.causa="Batallón 1" AND titanes.altura=(SELECT max(titanes.altura) FROM titanes);
+SELECT titanes.nombre, titanes.altura 
+FROM muertes
+JOIN titanes ON titanes.id=muertes.id_titan 
+WHERE muertes.causa="Batallón 1" AND
+titanes.altura=(
+	SELECT max(titanes.altura) FROM titanes
+);
+
+-- Nombre y altura de titanes que no se han podido matar aún, 
+-- junto con su último avistamiento (más reciente), ordenados por altura.
+
+SELECT titanes.nombre, titanes.altura, ultimos_avistamientos.ultimo_avistamiento
+FROM titanes
+JOIN (
+	-- subtabla solo con los ultimos avistameintos de cada titan
+	SELECT id_titan, MAX(fecha) AS ultimo_avistamiento
+	FROM titandb.avistamientos 
+	GROUP BY id_titan
+) as ultimos_avistamientos
+ON ultimos_avistamientos.id_titan = titanes.id
+WHERE titanes.id NOT IN (
+	SELECT muertes.id_titan FROM muertes
+)
+ORDER BY titanes.altura
