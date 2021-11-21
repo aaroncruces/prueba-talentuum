@@ -11,6 +11,8 @@ Escribe (en MySQL) los cambios que harías al modelo de datos para soportar y se
 
 */
 
+
+-- incluye personas con sus nombres
 CREATE TABLE IF NOT EXISTS `personas` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(255) NULL DEFAULT NULL,
@@ -42,3 +44,4 @@ ADD `id_persona` INT(11);
 
 ALTER TABLE muertes
 ADD FOREIGN KEY (id_persona) REFERENCES personas(id); 
+
