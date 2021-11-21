@@ -14,6 +14,7 @@ Escribe consultas (en MySQL) para rescatar la siguiente información del modelo 
     Lista de recursos que se han usado (recurso, cantidad, unidad) en matar titanes pequeños (<= 5 metros).
     Lista de titanes con incongruencias en torno a sus fechas de muerte y avistamientos.
 */
+-- 1:
 -- Nombre y altura del titán más alto que haya matado el “Batallón 1”.
 SELECT titanes.nombre, titanes.altura 
 FROM muertes
@@ -23,6 +24,7 @@ titanes.altura=(
 	SELECT max(titanes.altura) FROM titanes
 );
 
+-- 2:
 -- Nombre y altura de titanes que no se han podido matar aún, 
 -- junto con su último avistamiento (más reciente), ordenados por altura.
 
@@ -39,3 +41,15 @@ WHERE titanes.id NOT IN (
 	SELECT muertes.id_titan FROM muertes
 )
 ORDER BY titanes.altura
+
+-- 3:
+-- Lista de titanes que hayan sido vistos más de una vez el mismo año.
+SELECT titanes.id AS id_titan, titanes.nombre, conteo_avistamientos.año, conteo_avistamientos.avistamientos_ese_año
+FROM (
+	-- subtabla con conteo de avistamientos por año
+	SELECT id_titan, YEAR(fecha) AS año, COUNT(*) AS avistamientos_ese_año
+	FROM titandb.avistamientos
+	GROUP BY id_titan, YEAR(fecha)
+) AS conteo_avistamientos
+JOIN titanes ON titanes.id = conteo_avistamientos.id_titan
+WHERE conteo_avistamientos.avistamientos_ese_año > 1
