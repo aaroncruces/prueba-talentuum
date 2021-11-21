@@ -14,3 +14,41 @@ Ejemplo:
     Entrada: N = 9463
     Salida: A = 6352, B=3111
 */
+
+const entradaNumber = 946.3
+
+/**
+ * Toma divide los digitos que tienen 4, y los separa en 2 arrays con los digitos 2
+ * @param {*} entradaNumber 
+ * @returns 
+ */
+const separarSi4=
+(entradaNumber)=>{
+const entradaString = entradaNumber.toString()
+const entradaCharArray = Array.from(entradaString)
+const salidaCharArray = entradaCharArray.reduce(
+    (arrayCharDigitos, charDigitoEntrada) => {
+        //el array consiste en un array de chars con los digitos de los numeros separados
+        if (charDigitoEntrada == 4) {
+            arrayCharDigitos[0].push('2')
+            arrayCharDigitos[1].push('2')
+        } else if (charDigitoEntrada >= '0' && charDigitoEntrada <= '9'){
+            arrayCharDigitos[0].push(charDigitoEntrada)
+            arrayCharDigitos[1].push('0')
+        }
+        else {
+            //si hay , o .
+            arrayCharDigitos[0].push(charDigitoEntrada)
+            arrayCharDigitos[1].push(charDigitoEntrada)
+        }
+        return arrayCharDigitos
+    }, [
+        [],
+        []
+    ])
+const salidaStringArray = [salidaCharArray[0].join(""), salidaCharArray[1].join("")]
+const salidaNumberArray = [Number(salidaStringArray[0]), Number(salidaStringArray[1])]
+return salidaNumberArray
+}
+console.log(separarSi4(9463.442));
+
