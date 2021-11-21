@@ -28,6 +28,98 @@ Simboliza:
 Escribe un algoritmo que reciba, como input, el arreglo de datos definido por el archivo last_year.json y que retorne aquel día (el primero del año) en el que se avistaron menos titanes en las afueras de la ciudad. Considerando el entero “0” como el primero de enero. Se decide a priori no salir de la ciudad en los meses de diciembre ni enero, ya que el clima es impredecible y la posibilidad de que fracase la expedición es muy alta. Puedes usar cualquier lenguaje para escribir tu respuesta, aunque preferimos si usas uno de los siguientes: python, javascript (librerías extra permitidas), PHP. Usa la menor cantidad posible de bucles anidados.
 */
 
-//import * as data from"./last_year_test.json"
-const data = require('./last_year_test.json');
-console.log(data)
+/* 
+Me disculpo por la cantidad de comentarios,
+pero me fue dificil resumir la funcionalidad de cada funcion en una unica frase sin generar confusiones
+*/
+
+/**
+ * Toma un arreglo de 365 o mas elementos numericos (uno por dia) llamado frequencyList,
+ * por cada elemento en un rango, le añade +1, sumando a la frecuencia en cada dia
+ * asi, si recibe  el rango dayRange: [1,3], 
+ * se le sumaria al arreglo "frequencyList", el rango [+0,+1, +1, +0,...,+0]
+ * @param {Array} frequencyList 
+ * @param {Array} dayRange 
+ */
+const increaseFrequencyToCalendar =
+  (frequencyList, dayRange) => {
+    //validaciones
+    if (!frequencyList)
+      frequencyList = [];
+
+    if (!dayRange || dayRange.length != 2 || !Number.isInteger(dayRange[0]) || !Number.isInteger(dayRange[1]))
+      return frequencyList;
+
+    if (frequencyList.length < (dayRange[1] + 1))
+      frequencyList.length = (dayRange[1] + 1);
+
+    if (dayRange[0] > dayRange[1]) {
+      const tempRange = dayRange[0]
+      dayRange[0] = dayRange[1]
+      dayRange[1] = tempRange
+    }
+    //inicializacion NaN -> 0
+    for (let i = 0; i <= dayRange[1]; i++) {
+      if (isNaN(frequencyList[i]))
+        frequencyList[i] = 0;
+    }
+    //llenando con frecuencias
+    for (let i = dayRange[0]; i <= dayRange[1]; i++) {
+      frequencyList[i] += 1
+    }
+    return frequencyList
+  }
+
+/**
+ * Convierte una lista de rangos de dias como [[1,2],[1,1],[2,3],[1,5]]
+ * a una lista de frecuencias por cada dia, como
+ * [0,3,3,2,1,1]
+ * @param {Array} dayRangeList 
+ * @returns 
+ */
+const dayRangeListToFrequencyList =
+  dayRangeList => dayRangeList.reduce((calendarAccumulator, dayRange) =>
+    increaseFrequencyToCalendar(calendarAccumulator, dayRange), [])
+
+/**
+ * Convierte una lista de frecuencias por cada dia, como [0,3,3,2,1,1]
+ * a una lista de tuplas de [dia,frecuencia] como [[1,3],[2,3],[3,2],[4,1],[5,1],[0,0]]
+ * Esto es util si se va a reordenar la lista, asi se preserva su numero de dia
+ * @param {*} frequencyList 
+ * @returns 
+ */
+const appendFrequenciesToDayList = frequencyList => frequencyList.map((frequency, dayNumber) => [dayNumber, frequency])
+
+/**
+ * Ordena una lista de tuplas de [dia,frecuencia] como [[1,3],[2,3],[3,2],[4,1],[5,1],[0,0]]
+ * por su frecuencia, en orden descendente,
+ * obteniendo una lista del tipo [[0,0],[4,1],[5,1],[3,2],[1,3],[2,3]]
+ * 
+ * @param {*} calendarWithFrequency 
+ * @returns 
+ */
+const sortCalendarByFrecuency_ascending = calendarWithFrequency => calendarWithFrequency.sort((a, b) => a[1] - b[1])
+
+const daysInAYear = 365
+const daysInJanuary = 31
+const daysOnDecember = 31
+const isDayOnJanuary = (dayNumber) => dayNumber % daysInAYear < daysInJanuary;
+const isDayOnDecember = (dayNumber) => dayNumber % daysInAYear >= (daysInAYear - daysOnDecember)
+/**
+ * De una lista de tuplas [dia,frecuencia], que esten ordenadas,
+ * encuentra el primer elemento que no se encuentre en los meses enero o diciembre
+ * @param {*} sortedCalendar 
+ * @returns 
+ */
+const findSuitableDay_notJanNorDec =
+  sortedCalendar => sortedCalendar.find(
+    dayWithFrequency => !isDayOnJanuary(dayWithFrequency[0]) && !isDayOnDecember(dayWithFrequency[0])
+  )
+
+//ejecucion de algoritmos
+const dayRangeList = require('./last_year.json');
+const frequencyList = dayRangeListToFrequencyList(dayRangeList)
+const calendarWithFrequencyAppended = appendFrequenciesToDayList(frequencyList)
+const sortedCalendar = sortCalendarByFrecuency_ascending(calendarWithFrequencyAppended)
+const suitableDayToScout=findSuitableDay_notJanNorDec(sortedCalendar)
+console.log(`El dia mas adecuado para salir es el N°${suitableDayToScout[0]}, con una frecuencia de avistamientos de ${suitableDayToScout[1]} titanes`)
