@@ -29,6 +29,8 @@ Escribe un algoritmo que reciba, como input, el arreglo de datos definido por el
 */
 
 /* 
+Desarrollado en NodeJS usando CommonJS para importar last_year.json de manera local
+
 Me disculpo por la cantidad de comentarios,
 pero me fue dificil resumir la funcionalidad de cada funcion en una unica frase sin generar confusiones
 */
