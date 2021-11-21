@@ -53,3 +53,13 @@ FROM (
 ) AS conteo_avistamientos
 JOIN titanes ON titanes.id = conteo_avistamientos.id_titan
 WHERE conteo_avistamientos.avistamientos_ese_año > 1
+
+-- 4:
+-- Lista de recursos que se han usado (recurso, cantidad, unidad) en matar titanes pequeños (<= 5 metros).
+SELECT recursos.nombre, SUM(movimientos_recursos.cantidad) AS cantidad_total_usada, recursos.unidad
+FROM recursos
+JOIN movimientos_recursos 	ON recursos.id=movimientos_recursos.id_recurso
+JOIN muertes 				ON movimientos_recursos.id_muerte=muertes.id
+JOIN titanes 				ON muertes.id_titan=titanes.id
+WHERE titanes.altura<=5
+GROUP BY recursos.nombre, recursos.unidad
