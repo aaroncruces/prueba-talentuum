@@ -28,7 +28,10 @@ titanes.altura=(
 -- Nombre y altura de titanes que no se han podido matar aún, 
 -- junto con su último avistamiento (más reciente), ordenados por altura.
 
-SELECT titanes.nombre, titanes.altura, ultimos_avistamientos.ultimo_avistamiento
+SELECT 
+    titanes.nombre, 
+    titanes.altura, 
+    ultimos_avistamientos.ultimo_avistamiento
 FROM titanes
 JOIN (
 	-- subtabla solo con los ultimos avistameintos de cada titan
@@ -44,7 +47,11 @@ ORDER BY titanes.altura
 
 -- 3:
 -- Lista de titanes que hayan sido vistos más de una vez el mismo año.
-SELECT titanes.id AS id_titan, titanes.nombre, conteo_avistamientos.año, conteo_avistamientos.avistamientos_ese_año
+SELECT 
+    titanes.id AS id_titan, 
+    titanes.nombre, 
+    conteo_avistamientos.año, 
+    conteo_avistamientos.avistamientos_ese_año
 FROM (
 	-- subtabla con conteo de avistamientos por año
 	SELECT id_titan, YEAR(fecha) AS año, COUNT(*) AS avistamientos_ese_año
@@ -53,13 +60,32 @@ FROM (
 ) AS conteo_avistamientos
 JOIN titanes ON titanes.id = conteo_avistamientos.id_titan
 WHERE conteo_avistamientos.avistamientos_ese_año > 1
+;
 
 -- 4:
 -- Lista de recursos que se han usado (recurso, cantidad, unidad) en matar titanes pequeños (<= 5 metros).
-SELECT recursos.nombre, SUM(movimientos_recursos.cantidad) AS cantidad_total_usada, recursos.unidad
+SELECT 
+    recursos.nombre, 
+    SUM(movimientos_recursos.cantidad) AS cantidad_total_usada, 
+    recursos.unidad
 FROM recursos
 JOIN movimientos_recursos 	ON recursos.id=movimientos_recursos.id_recurso
 JOIN muertes 				ON movimientos_recursos.id_muerte=muertes.id
 JOIN titanes 				ON muertes.id_titan=titanes.id
 WHERE titanes.altura<=5
 GROUP BY recursos.nombre, recursos.unidad
+;
+
+-- 5:
+-- Lista de titanes con incongruencias en torno a sus fechas de muerte y avistamientos.
+SELECT 
+	muertes.id_titan, 
+    titanes.nombre, 
+    muertes.fecha AS fecha_muerte, 
+    avistamientos.fecha AS fecha_avistamiento
+FROM muertes, avistamientos, titanes
+WHERE 
+	muertes.id_titan=avistamientos.id_titan AND avistamientos.id_titan= titanes.id
+	AND
+	avistamientos.fecha > muertes.fecha
+;
